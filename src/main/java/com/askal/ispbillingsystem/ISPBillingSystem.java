@@ -19,6 +19,7 @@ public class ISPBillingSystem extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(ISPBillingSystem.class.getName());
     // --colors------------------------------------
+    
     static final Color MAIN_BG = new Color(245, 247, 250);
     static final Color CARD_BG = Color.WHITE;
     static final Color BORDER_CLR = new Color(220, 225, 235);
@@ -46,8 +47,8 @@ public class ISPBillingSystem extends javax.swing.JFrame {
         activeSideBtn = btnDashboard;
         btnDashboard.setBackground(new java.awt.Color(40, 90, 137));
 
-        refreshDashboard();
         
+    //----------------------DASHBOARD MODIFICATION CUSTOM----------------------------------    
         //table
         String[] cols = {"ID","Full Name","Address","Plan","Balance","Status"};
         DefaultTableModel model = new DefaultTableModel(cols, 0) {
@@ -58,22 +59,48 @@ public class ISPBillingSystem extends javax.swing.JFrame {
         customerScrollPane.setViewportView(customerTable);
         
         styleStatusColumn(customerTable, 5);
+              
+        SwingUtilities.invokeLater(() -> {
+            for (Customer c2 : dao.getAllCustomers())
+            model.addRow(new Object[]{c2.getId(), c2.getFullName(), c2.getAddress(), c2.getPlan(),
+            String.format("₱%.2f", c2.getBalance()), c2.getStatus()});
+        });
         
-        customerTable.setFont(new Font("SansSerif", Font.PLAIN, 12));
-        customerTable.setRowHeight(28);
-        customerTable.setShowGrid(false);
-        
-        for (Customer c : dao.getAllCustomers()) {
-            model.addRow(new Object[]{
-            c.getId(), c.getFullName(), c.getAddress(),
-            c.getPlan(), String.format("₱%.2f", c.getBalance()), c.getStatus()
-            });
-        }
-        
-        tableCard.setBorder(BorderFactory.createLineBorder(BORDER_CLR));
+        handlerTable.setBorder(BorderFactory.createLineBorder(BORDER_CLR));
         customerScrollPane.setBorder(BorderFactory.createEmptyBorder());
+        
+        
+        //----------------------CUSTOMER MODIFICATION CUSTOM----------------------------------  
+        //searchField
+        searchField.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(BORDER_CLR), new EmptyBorder(5,8,5,8)));
+        searchField.setToolTipText("Search by name...");
+        
+        refreshDashboard();
+        refreshCustomerTable();
     }
     
+    //-----------JDialogs----------------------
+    void showAddCustomerDialog() {
+        CustomerDialog dialog = new CustomerDialog(this, null);
+        dialog.setVisible(true);
+    if (dialog.isSaved()) {
+        dao.addCustomer(dialog.getCustomer());
+        refreshCustomerTable();
+        refreshDashboard();
+    }
+}
+
+    void showEditCustomerDialog(Customer c) {
+        CustomerDialog dialog = new CustomerDialog(this, c);
+        dialog.setVisible(true);
+    if (dialog.isSaved()) {
+        dao.updateCustomer(dialog.getCustomer());
+        refreshCustomerTable();
+        refreshDashboard();
+    }
+}
+
+    //=============other methods===============
     void refreshDashboard() {
         SwingUtilities.invokeLater(() -> {
             statusTotal.setText(String.valueOf(dao.getTotalCustomers()));
@@ -82,6 +109,18 @@ public class ISPBillingSystem extends javax.swing.JFrame {
             statusBalance.setText(String.format("₱%.0f", dao.getTotalBalance()));
         });
     }
+    
+    void refreshCustomerTable() {
+    javax.swing.table.DefaultTableModel model =
+        (javax.swing.table.DefaultTableModel) custTable.getModel();
+    model.setRowCount(0);
+    for (Customer c : dao.getAllCustomers()) {
+        model.addRow(new Object[]{
+            c.getId(), c.getFullName(), c.getAddress(),
+            c.getPlan(), String.format("₱%.2f", c.getBalance()), c.getStatus()
+        });
+    }
+}
     
     void styleStatusColumn(JTable tbl, int col) {
     tbl.getColumnModel().getColumn(col).setCellRenderer(new DefaultTableCellRenderer() {
@@ -173,11 +212,26 @@ public class ISPBillingSystem extends javax.swing.JFrame {
         lblBalance = new javax.swing.JLabel();
         statusBalance = new javax.swing.JLabel();
         dSpacer = new javax.swing.JPanel();
+        handlerTable = new javax.swing.JPanel();
         tableCard = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         customerScrollPane = new javax.swing.JScrollPane();
         customerTable = new javax.swing.JTable();
         customerPanel = new javax.swing.JPanel();
+        lblCustomerHeader = new javax.swing.JLabel();
+        handlerCustomer = new javax.swing.JPanel();
+        custCenterPanel = new javax.swing.JPanel();
+        custToolBar = new javax.swing.JPanel();
+        searchField = new javax.swing.JTextField();
+        addBtn = new javax.swing.JButton();
+        editBtn = new javax.swing.JButton();
+        delBtn = new javax.swing.JButton();
+        payBtn = new javax.swing.JButton();
+        refBtn = new javax.swing.JButton();
+        custTableHandler = new javax.swing.JPanel();
+        custTableCard = new javax.swing.JPanel();
+        custScrollPane = new javax.swing.JScrollPane();
+        custTable = new javax.swing.JTable();
         billingPanel = new javax.swing.JPanel();
         receiptsPanel = new javax.swing.JPanel();
         reportsPanel = new javax.swing.JPanel();
@@ -458,13 +512,20 @@ public class ISPBillingSystem extends javax.swing.JFrame {
 
         dashCenterPanel.add(dSpacer);
 
+        handlerTable.setBackground(new java.awt.Color(255, 255, 255));
+        handlerTable.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(220, 225, 235), 1, true));
+        handlerTable.setLayout(new java.awt.BorderLayout(12, 12));
+
         tableCard.setBackground(new java.awt.Color(255, 255, 255));
-        tableCard.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(220, 225, 235), 1, true));
+        tableCard.setBorder(javax.swing.BorderFactory.createEmptyBorder(12, 12, 12, 12));
         tableCard.setLayout(new java.awt.BorderLayout(12, 12));
 
+        jLabel2.setFont(new java.awt.Font("SansSerif", 1, 14)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(0, 0, 0));
         jLabel2.setText("All Customers");
         tableCard.add(jLabel2, java.awt.BorderLayout.PAGE_START);
 
+        customerScrollPane.setBackground(new java.awt.Color(255, 255, 255));
         customerScrollPane.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
 
         customerTable.setModel(new javax.swing.table.DefaultTableModel(
@@ -483,14 +544,119 @@ public class ISPBillingSystem extends javax.swing.JFrame {
 
         tableCard.add(customerScrollPane, java.awt.BorderLayout.CENTER);
 
-        dashCenterPanel.add(tableCard);
+        handlerTable.add(tableCard, java.awt.BorderLayout.CENTER);
+
+        dashCenterPanel.add(handlerTable);
 
         dashboardPanel.add(dashCenterPanel, java.awt.BorderLayout.CENTER);
 
         contentPanel.add(dashboardPanel, "dashboard");
 
         customerPanel.setBackground(new java.awt.Color(245, 247, 250));
-        customerPanel.setLayout(new java.awt.GridBagLayout());
+        customerPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(14, 14, 14, 14));
+        customerPanel.setLayout(new java.awt.BorderLayout());
+
+        lblCustomerHeader.setFont(new java.awt.Font("SansSerif", 1, 18)); // NOI18N
+        lblCustomerHeader.setForeground(new java.awt.Color(30, 40, 55));
+        lblCustomerHeader.setText("Customer Management");
+        lblCustomerHeader.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 12, 0));
+        lblCustomerHeader.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        customerPanel.add(lblCustomerHeader, java.awt.BorderLayout.PAGE_START);
+
+        handlerCustomer.setBackground(new java.awt.Color(255, 255, 255));
+        handlerCustomer.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(220, 225, 235), 2, true));
+        handlerCustomer.setLayout(new java.awt.BorderLayout());
+
+        custCenterPanel.setBackground(new java.awt.Color(245, 247, 250));
+        custCenterPanel.setForeground(new java.awt.Color(30, 40, 55));
+        custCenterPanel.setLayout(new java.awt.BorderLayout());
+
+        custToolBar.setBackground(new java.awt.Color(255, 255, 255));
+        custToolBar.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 5, 10, 0));
+        custToolBar.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 8, 0));
+
+        searchField.setColumns(22);
+        searchField.setFont(new java.awt.Font("SansSerif", 0, 12)); // NOI18N
+        searchField.setCursor(new java.awt.Cursor(java.awt.Cursor.TEXT_CURSOR));
+        searchField.addActionListener(this::searchFieldActionPerformed);
+        custToolBar.add(searchField);
+
+        addBtn.setBackground(new java.awt.Color(230, 241, 251));
+        addBtn.setFont(new java.awt.Font("SansSerif", 0, 12)); // NOI18N
+        addBtn.setForeground(new java.awt.Color(12, 68, 124));
+        addBtn.setText("+ Add");
+        addBtn.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 8, 5, 8));
+        addBtn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        addBtn.addActionListener(this::addBtnActionPerformed);
+        custToolBar.add(addBtn);
+
+        editBtn.setBackground(new java.awt.Color(255, 255, 255));
+        editBtn.setFont(new java.awt.Font("SansSerif", 0, 12)); // NOI18N
+        editBtn.setForeground(new java.awt.Color(30, 40, 55));
+        editBtn.setText("Edit");
+        editBtn.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 8, 5, 8));
+        editBtn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        editBtn.addActionListener(this::editBtnActionPerformed);
+        custToolBar.add(editBtn);
+
+        delBtn.setBackground(new java.awt.Color(252, 235, 235));
+        delBtn.setFont(new java.awt.Font("SansSerif", 0, 12)); // NOI18N
+        delBtn.setForeground(new java.awt.Color(163, 45, 45));
+        delBtn.setText("Delete");
+        delBtn.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 8, 5, 8));
+        delBtn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        custToolBar.add(delBtn);
+
+        payBtn.setBackground(new java.awt.Color(234, 243, 222));
+        payBtn.setFont(new java.awt.Font("SansSerif", 0, 12)); // NOI18N
+        payBtn.setForeground(new java.awt.Color(39, 80, 10));
+        payBtn.setText("Mark Paid");
+        payBtn.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 8, 5, 8));
+        payBtn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        custToolBar.add(payBtn);
+
+        refBtn.setBackground(new java.awt.Color(255, 255, 255));
+        refBtn.setFont(new java.awt.Font("SansSerif", 0, 12)); // NOI18N
+        refBtn.setForeground(new java.awt.Color(30, 40, 55));
+        refBtn.setText("Refresh");
+        refBtn.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 8, 5, 8));
+        refBtn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        custToolBar.add(refBtn);
+
+        custCenterPanel.add(custToolBar, java.awt.BorderLayout.PAGE_START);
+
+        custTableHandler.setBackground(new java.awt.Color(255, 255, 255));
+        custTableHandler.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 12, 10, 12));
+        custTableHandler.setLayout(new java.awt.BorderLayout());
+
+        custTableCard.setBackground(new java.awt.Color(255, 255, 255));
+        custTableCard.setLayout(new java.awt.BorderLayout());
+
+        custScrollPane.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+
+        custTable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        custScrollPane.setViewportView(custTable);
+
+        custTableCard.add(custScrollPane, java.awt.BorderLayout.CENTER);
+
+        custTableHandler.add(custTableCard, java.awt.BorderLayout.CENTER);
+
+        custCenterPanel.add(custTableHandler, java.awt.BorderLayout.CENTER);
+
+        handlerCustomer.add(custCenterPanel, java.awt.BorderLayout.CENTER);
+
+        customerPanel.add(handlerCustomer, java.awt.BorderLayout.CENTER);
+
         contentPanel.add(customerPanel, "customers");
 
         billingPanel.setBackground(new java.awt.Color(245, 247, 250));
@@ -599,6 +765,18 @@ public class ISPBillingSystem extends javax.swing.JFrame {
         if (btnReports != activeSideBtn) btnReports.setBackground(new java.awt.Color(12, 68, 124));
     }//GEN-LAST:event_btnReportsMouseExited
 
+    private void searchFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_searchFieldActionPerformed
+
+    private void editBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editBtnActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_editBtnActionPerformed
+
+    private void addBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addBtnActionPerformed
+        showAddCustomerDialog();
+    }//GEN-LAST:event_addBtnActionPerformed
+
     
     
     public static void main(String args[]) {
@@ -606,6 +784,7 @@ public class ISPBillingSystem extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton addBtn;
     private javax.swing.JPanel billingPanel;
     private javax.swing.JLabel bl;
     private javax.swing.JPanel bodyPanel;
@@ -624,24 +803,38 @@ public class ISPBillingSystem extends javax.swing.JFrame {
     private javax.swing.JPanel cardUnpaid;
     private javax.swing.JLabel cl;
     private javax.swing.JPanel contentPanel;
+    private javax.swing.JPanel custCenterPanel;
+    private javax.swing.JScrollPane custScrollPane;
+    private javax.swing.JTable custTable;
+    private javax.swing.JPanel custTableCard;
+    private javax.swing.JPanel custTableHandler;
+    private javax.swing.JPanel custToolBar;
     private javax.swing.JPanel customerPanel;
     private javax.swing.JScrollPane customerScrollPane;
     private javax.swing.JTable customerTable;
     private javax.swing.JPanel dSpacer;
     private javax.swing.JPanel dashCenterPanel;
     private javax.swing.JPanel dashboardPanel;
+    private javax.swing.JButton delBtn;
     private javax.swing.JLabel dl;
+    private javax.swing.JButton editBtn;
+    private javax.swing.JPanel handlerCustomer;
+    private javax.swing.JPanel handlerTable;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel lblBalance;
+    private javax.swing.JLabel lblCustomerHeader;
     private javax.swing.JLabel lblDashboardHeader;
     private javax.swing.JLabel lblPaid;
     private javax.swing.JLabel lblTotal;
     private javax.swing.JLabel lblUnpaid;
     private javax.swing.JPanel logo;
     private javax.swing.JLabel n;
+    private javax.swing.JButton payBtn;
     private javax.swing.JPanel receiptsPanel;
+    private javax.swing.JButton refBtn;
     private javax.swing.JPanel reportsPanel;
+    private javax.swing.JTextField searchField;
     private javax.swing.JLabel statusBalance;
     private javax.swing.JLabel statusPaid;
     private javax.swing.JLabel statusTotal;
