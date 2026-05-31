@@ -4,6 +4,7 @@
  */
 package com.askal.ispbillingsystem;
 
+import javax.swing.SwingUtilities;
 import javax.swing.border.*;
 
 /**
@@ -15,14 +16,27 @@ public class ISPBillingSystem extends javax.swing.JFrame {
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(ISPBillingSystem.class.getName());
     private javax.swing.JPanel activeSideBtn = null;
     
+    //database
+    CustomerDAO dao = new CustomerDAO();
+    
     public ISPBillingSystem() {
         
         initComponents();
         activeSideBtn = btnDashboard;
         btnDashboard.setBackground(new java.awt.Color(40, 90, 137));
         
+        
+        
     }
-
+    
+    void refreshDashboard() {
+        SwingUtilities.invokeLater(() -> {
+            statusTotal.setText(String.valueOf(dao.getTotalCustomers()));
+            statusPaid.setText(String.valueOf(dao.getPaidCount()));
+            statusUnpaid.setText(String.valueOf(dao.getUnpaidCount()));
+            statusBalance.setText(String.format("₱%.0f", dao.getTotalBalance()));
+        });
+    }
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -46,12 +60,21 @@ public class ISPBillingSystem extends javax.swing.JFrame {
         brep = new javax.swing.JLabel();
         contentPanel = new javax.swing.JPanel();
         dashboardPanel = new javax.swing.JPanel();
-        summaryRowPanel = new javax.swing.JPanel();
-        jPanel1 = new javax.swing.JPanel();
-        jPanel2 = new javax.swing.JPanel();
-        jPanel3 = new javax.swing.JPanel();
-        jPanel4 = new javax.swing.JPanel();
         lblDashboardHeader = new javax.swing.JLabel();
+        dashCenterPanel = new javax.swing.JPanel();
+        summaryRowPanel = new javax.swing.JPanel();
+        cardTotal = new javax.swing.JPanel();
+        lblTotal = new javax.swing.JLabel();
+        statusTotal = new javax.swing.JLabel();
+        cardPaid = new javax.swing.JPanel();
+        lblPaid = new javax.swing.JLabel();
+        statusPaid = new javax.swing.JLabel();
+        cardUnpaid = new javax.swing.JPanel();
+        lblUnpaid = new javax.swing.JLabel();
+        statusUnpaid = new javax.swing.JLabel();
+        cardBalance = new javax.swing.JPanel();
+        lblBalance = new javax.swing.JLabel();
+        statusBalance = new javax.swing.JLabel();
         customerPanel = new javax.swing.JPanel();
         billingPanel = new javax.swing.JPanel();
         receiptsPanel = new javax.swing.JPanel();
@@ -78,7 +101,7 @@ public class ISPBillingSystem extends javax.swing.JFrame {
             .addGroup(buildTopBarLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel1)
-                .addContainerGap(744, Short.MAX_VALUE))
+                .addContainerGap(807, Short.MAX_VALUE))
         );
         buildTopBarLayout.setVerticalGroup(
             buildTopBarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -233,70 +256,89 @@ public class ISPBillingSystem extends javax.swing.JFrame {
         dashboardPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(14, 14, 14, 14));
         dashboardPanel.setLayout(new java.awt.BorderLayout());
 
-        summaryRowPanel.setBackground(new java.awt.Color(245, 247, 250));
-        summaryRowPanel.setForeground(new java.awt.Color(245, 247, 250));
-        summaryRowPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 20, 20));
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
-        );
-
-        summaryRowPanel.add(jPanel1);
-
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
-        );
-
-        summaryRowPanel.add(jPanel2);
-
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
-        );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
-        );
-
-        summaryRowPanel.add(jPanel3);
-
-        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
-        jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
-        );
-        jPanel4Layout.setVerticalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
-        );
-
-        summaryRowPanel.add(jPanel4);
-
-        dashboardPanel.add(summaryRowPanel, java.awt.BorderLayout.CENTER);
-
         lblDashboardHeader.setFont(new java.awt.Font("SansSerif", 1, 18)); // NOI18N
         lblDashboardHeader.setForeground(new java.awt.Color(30, 40, 55));
         lblDashboardHeader.setText("Dashboard");
         lblDashboardHeader.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 12, 0));
         lblDashboardHeader.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         dashboardPanel.add(lblDashboardHeader, java.awt.BorderLayout.PAGE_START);
+
+        dashCenterPanel.setBackground(new java.awt.Color(245, 247, 250));
+        dashCenterPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 14, 14, 14));
+        dashCenterPanel.setLayout(new javax.swing.BoxLayout(dashCenterPanel, javax.swing.BoxLayout.Y_AXIS));
+
+        summaryRowPanel.setBackground(new java.awt.Color(245, 247, 250));
+        summaryRowPanel.setForeground(new java.awt.Color(245, 247, 250));
+        summaryRowPanel.setMaximumSize(new java.awt.Dimension(32767, 90));
+        summaryRowPanel.setLayout(new java.awt.GridLayout(1, 4, 10, 0));
+
+        cardTotal.setBackground(new java.awt.Color(230, 241, 251));
+        cardTotal.setBorder(javax.swing.BorderFactory.createEmptyBorder(12, 14, 12, 14));
+        cardTotal.setLayout(new java.awt.BorderLayout());
+
+        lblTotal.setFont(new java.awt.Font("SansSerif", 1, 24)); // NOI18N
+        lblTotal.setForeground(new java.awt.Color(30, 40, 55));
+        lblTotal.setText("...");
+        cardTotal.add(lblTotal, java.awt.BorderLayout.CENTER);
+
+        statusTotal.setFont(new java.awt.Font("SansSerif", 0, 12)); // NOI18N
+        statusTotal.setForeground(new java.awt.Color(100, 110, 130));
+        statusTotal.setText("Total Customers");
+        cardTotal.add(statusTotal, java.awt.BorderLayout.PAGE_START);
+
+        summaryRowPanel.add(cardTotal);
+
+        cardPaid.setBackground(new java.awt.Color(234, 243, 222));
+        cardPaid.setBorder(javax.swing.BorderFactory.createEmptyBorder(12, 14, 12, 14));
+        cardPaid.setLayout(new java.awt.BorderLayout());
+
+        lblPaid.setFont(new java.awt.Font("SansSerif", 0, 12)); // NOI18N
+        lblPaid.setForeground(new java.awt.Color(100, 110, 130));
+        lblPaid.setText("Paid Accounts");
+        cardPaid.add(lblPaid, java.awt.BorderLayout.PAGE_START);
+
+        statusPaid.setFont(new java.awt.Font("SansSerif", 1, 24)); // NOI18N
+        statusPaid.setForeground(new java.awt.Color(30, 40, 55));
+        statusPaid.setText("...");
+        cardPaid.add(statusPaid, java.awt.BorderLayout.CENTER);
+
+        summaryRowPanel.add(cardPaid);
+
+        cardUnpaid.setBackground(new java.awt.Color(252, 235, 235));
+        cardUnpaid.setBorder(javax.swing.BorderFactory.createEmptyBorder(12, 14, 12, 14));
+        cardUnpaid.setLayout(new java.awt.BorderLayout());
+
+        lblUnpaid.setFont(new java.awt.Font("SansSerif", 0, 12)); // NOI18N
+        lblUnpaid.setForeground(new java.awt.Color(100, 110, 130));
+        lblUnpaid.setText("Unpaid Accounts");
+        cardUnpaid.add(lblUnpaid, java.awt.BorderLayout.PAGE_START);
+
+        statusUnpaid.setFont(new java.awt.Font("SansSerif", 1, 24)); // NOI18N
+        statusUnpaid.setForeground(new java.awt.Color(30, 40, 55));
+        statusUnpaid.setText("...");
+        cardUnpaid.add(statusUnpaid, java.awt.BorderLayout.CENTER);
+
+        summaryRowPanel.add(cardUnpaid);
+
+        cardBalance.setBackground(new java.awt.Color(250, 238, 218));
+        cardBalance.setBorder(javax.swing.BorderFactory.createEmptyBorder(12, 14, 12, 14));
+        cardBalance.setLayout(new java.awt.BorderLayout());
+
+        lblBalance.setFont(new java.awt.Font("SansSerif", 0, 12)); // NOI18N
+        lblBalance.setForeground(new java.awt.Color(100, 110, 130));
+        lblBalance.setText("Total Balance Due");
+        cardBalance.add(lblBalance, java.awt.BorderLayout.PAGE_START);
+
+        statusBalance.setFont(new java.awt.Font("SansSerif", 1, 24)); // NOI18N
+        statusBalance.setForeground(new java.awt.Color(30, 40, 55));
+        statusBalance.setText("...");
+        cardBalance.add(statusBalance, java.awt.BorderLayout.CENTER);
+
+        summaryRowPanel.add(cardBalance);
+
+        dashCenterPanel.add(summaryRowPanel);
+
+        dashboardPanel.add(dashCenterPanel, java.awt.BorderLayout.CENTER);
 
         contentPanel.add(dashboardPanel, "dashboard");
 
@@ -429,21 +471,30 @@ public class ISPBillingSystem extends javax.swing.JFrame {
     private javax.swing.JPanel btnReports;
     private javax.swing.JPanel buildSideBar;
     private javax.swing.JPanel buildTopBar;
+    private javax.swing.JPanel cardBalance;
+    private javax.swing.JPanel cardPaid;
+    private javax.swing.JPanel cardTotal;
+    private javax.swing.JPanel cardUnpaid;
     private javax.swing.JLabel cl;
     private javax.swing.JPanel contentPanel;
     private javax.swing.JPanel customerPanel;
+    private javax.swing.JPanel dashCenterPanel;
     private javax.swing.JPanel dashboardPanel;
     private javax.swing.JLabel dl;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
+    private javax.swing.JLabel lblBalance;
     private javax.swing.JLabel lblDashboardHeader;
+    private javax.swing.JLabel lblPaid;
+    private javax.swing.JLabel lblTotal;
+    private javax.swing.JLabel lblUnpaid;
     private javax.swing.JPanel logo;
     private javax.swing.JLabel n;
     private javax.swing.JPanel receiptsPanel;
     private javax.swing.JPanel reportsPanel;
+    private javax.swing.JLabel statusBalance;
+    private javax.swing.JLabel statusPaid;
+    private javax.swing.JLabel statusTotal;
+    private javax.swing.JLabel statusUnpaid;
     private javax.swing.JPanel summaryRowPanel;
     private javax.swing.JLabel v;
     // End of variables declaration//GEN-END:variables
