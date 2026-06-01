@@ -164,4 +164,32 @@ public class CustomerDAO {
             return total;
         } catch (Exception e) { e.printStackTrace(); return 0; }
     }
+    
+    public Customer getCustomerById(int id) {
+    try {
+        Connection conn = DBConnection.connect();
+        if (conn == null) return null;
+        String sql = "SELECT * FROM customers WHERE id = ?";
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        stmt.setInt(1, id);
+        ResultSet rs = stmt.executeQuery();
+        if (rs.next()) {
+            Customer c = new Customer(
+                rs.getInt("id"),
+                rs.getString("firstName"),
+                rs.getString("lastName"),
+                rs.getString("address"),
+                rs.getString("plan"),
+                rs.getDouble("balance"),
+                rs.getString("status")
+            );
+            conn.close();
+            return c;
+        }
+        conn.close();
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return null;
+}
 }

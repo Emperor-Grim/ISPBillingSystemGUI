@@ -77,7 +77,6 @@ public class CustomerDialog extends javax.swing.JDialog {
 
         fFirst.setColumns(15);
         fFirst.setFont(new java.awt.Font("SansSerif", 0, 12)); // NOI18N
-        fFirst.setText("\"\"");
         formPanel.add(fFirst);
 
         jLabel2.setFont(new java.awt.Font("SansSerif", 0, 12)); // NOI18N
@@ -87,7 +86,6 @@ public class CustomerDialog extends javax.swing.JDialog {
 
         fLast.setColumns(15);
         fLast.setFont(new java.awt.Font("SansSerif", 0, 12)); // NOI18N
-        fLast.setText("\"\"");
         formPanel.add(fLast);
 
         JLabel3.setFont(new java.awt.Font("SansSerif", 0, 12)); // NOI18N
@@ -96,7 +94,6 @@ public class CustomerDialog extends javax.swing.JDialog {
         formPanel.add(JLabel3);
 
         fAddr.setFont(new java.awt.Font("SansSerif", 0, 12)); // NOI18N
-        fAddr.setText("\"\"");
         formPanel.add(fAddr);
 
         jLabel4.setFont(new java.awt.Font("SansSerif", 0, 12)); // NOI18N
@@ -114,7 +111,7 @@ public class CustomerDialog extends javax.swing.JDialog {
         formPanel.add(jLabel5);
 
         fBal.setFont(new java.awt.Font("SansSerif", 0, 12)); // NOI18N
-        fBal.setText("\"0.00\"");
+        fBal.addActionListener(this::fBalActionPerformed);
         formPanel.add(fBal);
 
         jLabel6.setFont(new java.awt.Font("SansSerif", 0, 12)); // NOI18N
@@ -164,6 +161,10 @@ public class CustomerDialog extends javax.swing.JDialog {
         javax.swing.JOptionPane.showMessageDialog(this, "Balance must be a valid number.");
     }
     }//GEN-LAST:event_saveBtnActionPerformed
+
+    private void fBalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fBalActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_fBalActionPerformed
 
     /**
      * @param args the command line arguments

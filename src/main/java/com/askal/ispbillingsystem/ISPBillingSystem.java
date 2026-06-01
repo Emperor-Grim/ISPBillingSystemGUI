@@ -49,7 +49,7 @@ public class ISPBillingSystem extends javax.swing.JFrame {
 
         
     //----------------------DASHBOARD MODIFICATION CUSTOM----------------------------------    
-        //table
+        //table Dashboard
         String[] cols = {"ID","Full Name","Address","Plan","Balance","Status"};
         DefaultTableModel model = new DefaultTableModel(cols, 0) {
         public boolean isCellEditable(int r, int c) { return false; }
@@ -57,8 +57,18 @@ public class ISPBillingSystem extends javax.swing.JFrame {
         
         customerTable = styledTable(model);
         customerScrollPane.setViewportView(customerTable);
-        
         styleStatusColumn(customerTable, 5);
+        
+        //table Customer Panel
+        String[] custCols = {"ID","Full Name","Address","Plan","Balance","Status"};
+        DefaultTableModel custModel = new DefaultTableModel(custCols, 0) {
+        public boolean isCellEditable(int r, int c) { return false; }
+        };
+        
+        custTable = styledTable(model);
+        custScrollPane.setViewportView(custTable);
+        styleStatusColumn(custTable, 5);
+        
               
         SwingUtilities.invokeLater(() -> {
             for (Customer c2 : dao.getAllCustomers())
@@ -214,7 +224,9 @@ public class ISPBillingSystem extends javax.swing.JFrame {
         dSpacer = new javax.swing.JPanel();
         handlerTable = new javax.swing.JPanel();
         tableCard = new javax.swing.JPanel();
+        jPanel1 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
+        refBtn1 = new javax.swing.JButton();
         customerScrollPane = new javax.swing.JScrollPane();
         customerTable = new javax.swing.JTable();
         customerPanel = new javax.swing.JPanel();
@@ -520,10 +532,24 @@ public class ISPBillingSystem extends javax.swing.JFrame {
         tableCard.setBorder(javax.swing.BorderFactory.createEmptyBorder(12, 12, 12, 12));
         tableCard.setLayout(new java.awt.BorderLayout(12, 12));
 
+        jPanel1.setOpaque(false);
+        jPanel1.setLayout(new java.awt.BorderLayout());
+
         jLabel2.setFont(new java.awt.Font("SansSerif", 1, 14)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(0, 0, 0));
         jLabel2.setText("All Customers");
-        tableCard.add(jLabel2, java.awt.BorderLayout.PAGE_START);
+        jPanel1.add(jLabel2, java.awt.BorderLayout.WEST);
+
+        refBtn1.setBackground(new java.awt.Color(230, 241, 251));
+        refBtn1.setFont(new java.awt.Font("SansSerif", 0, 12)); // NOI18N
+        refBtn1.setForeground(new java.awt.Color(12, 68, 124));
+        refBtn1.setText("Refresh");
+        refBtn1.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 8, 5, 8));
+        refBtn1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        refBtn1.addActionListener(this::refBtn1ActionPerformed);
+        jPanel1.add(refBtn1, java.awt.BorderLayout.EAST);
+
+        tableCard.add(jPanel1, java.awt.BorderLayout.NORTH);
 
         customerScrollPane.setBackground(new java.awt.Color(255, 255, 255));
         customerScrollPane.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
@@ -605,6 +631,7 @@ public class ISPBillingSystem extends javax.swing.JFrame {
         delBtn.setText("Delete");
         delBtn.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 8, 5, 8));
         delBtn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        delBtn.addActionListener(this::delBtnActionPerformed);
         custToolBar.add(delBtn);
 
         payBtn.setBackground(new java.awt.Color(234, 243, 222));
@@ -613,6 +640,7 @@ public class ISPBillingSystem extends javax.swing.JFrame {
         payBtn.setText("Mark Paid");
         payBtn.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 8, 5, 8));
         payBtn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        payBtn.addActionListener(this::payBtnActionPerformed);
         custToolBar.add(payBtn);
 
         refBtn.setBackground(new java.awt.Color(255, 255, 255));
@@ -621,6 +649,7 @@ public class ISPBillingSystem extends javax.swing.JFrame {
         refBtn.setText("Refresh");
         refBtn.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 8, 5, 8));
         refBtn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        refBtn.addActionListener(this::refBtnActionPerformed);
         custToolBar.add(refBtn);
 
         custCenterPanel.add(custToolBar, java.awt.BorderLayout.PAGE_START);
@@ -766,16 +795,63 @@ public class ISPBillingSystem extends javax.swing.JFrame {
     }//GEN-LAST:event_btnReportsMouseExited
 
     private void searchFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchFieldActionPerformed
-        // TODO add your handling code here:
+        String query = searchField.getText().trim().toLowerCase();
+        DefaultTableModel m = (DefaultTableModel) custTable.getModel();
+        m.setRowCount(0);
+        for (Customer c : dao.getAllCustomers()) {
+            if (c.getFullName().toLowerCase().contains(query) ||
+                c.getAddress().toLowerCase().contains(query)) {
+                m.addRow(new Object[]{
+                    c.getId(), c.getFullName(), c.getAddress(),
+                    c.getPlan(), String.format("₱%.2f", c.getBalance()), c.getStatus()
+                });
+            }
+        }
     }//GEN-LAST:event_searchFieldActionPerformed
 
     private void editBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editBtnActionPerformed
-        // TODO add your handling code here:
+        int row = custTable.getSelectedRow();
+            if (row == -1) { JOptionPane.showMessageDialog(this, "Select a customer first."); return; }
+            int id = (int) custTable.getValueAt(row, 0);
+        showEditCustomerDialog(dao.getCustomerById(id));
     }//GEN-LAST:event_editBtnActionPerformed
 
     private void addBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addBtnActionPerformed
         showAddCustomerDialog();
     }//GEN-LAST:event_addBtnActionPerformed
+
+    private void delBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_delBtnActionPerformed
+        int row = custTable.getSelectedRow();
+            if (row == -1) { JOptionPane.showMessageDialog(this, "Select a customer first."); return; }
+            int id = (int) custTable.getValueAt(row, 0);
+            int confirm = JOptionPane.showConfirmDialog(this, "Delete this customer?", "Confirm", JOptionPane.YES_NO_OPTION);
+            if (confirm == JOptionPane.YES_OPTION) {
+        dao.deleteCustomer(id);
+        refreshCustomerTable();
+        refreshDashboard();
+        }
+    }//GEN-LAST:event_delBtnActionPerformed
+
+    private void payBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_payBtnActionPerformed
+        int row = custTable.getSelectedRow();
+        if (row == -1) { JOptionPane.showMessageDialog(this, "Select a customer first."); return; }
+        int id = (int) custTable.getValueAt(row, 0);
+        dao.markAsPaid(id);
+        refreshCustomerTable();
+        refreshDashboard();
+    }//GEN-LAST:event_payBtnActionPerformed
+
+    private void refBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refBtnActionPerformed
+        searchField.setText("");
+        refreshCustomerTable();
+        refreshDashboard();
+    }//GEN-LAST:event_refBtnActionPerformed
+
+    private void refBtn1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refBtn1ActionPerformed
+        searchField.setText("");
+        refreshCustomerTable();
+        refreshDashboard();
+    }//GEN-LAST:event_refBtn1ActionPerformed
 
     
     
@@ -822,6 +898,7 @@ public class ISPBillingSystem extends javax.swing.JFrame {
     private javax.swing.JPanel handlerTable;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel lblBalance;
     private javax.swing.JLabel lblCustomerHeader;
     private javax.swing.JLabel lblDashboardHeader;
@@ -833,6 +910,7 @@ public class ISPBillingSystem extends javax.swing.JFrame {
     private javax.swing.JButton payBtn;
     private javax.swing.JPanel receiptsPanel;
     private javax.swing.JButton refBtn;
+    private javax.swing.JButton refBtn1;
     private javax.swing.JPanel reportsPanel;
     private javax.swing.JTextField searchField;
     private javax.swing.JLabel statusBalance;
