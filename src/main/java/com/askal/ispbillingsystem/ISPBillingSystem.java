@@ -12,8 +12,16 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 /**
- *
- * @author Lorence
+ CREATE TABLE bills (
+    id          INT PRIMARY KEY AUTO_INCREMENT,
+    customerId  INT,
+    period      VARCHAR(50),
+    amount      DOUBLE,
+    dueDate     DATE,
+    paidDate    DATE,
+    status      VARCHAR(20) DEFAULT 'Unpaid',
+    FOREIGN KEY (customerId) REFERENCES customers(id)
+ );
  */
 public class ISPBillingSystem extends javax.swing.JFrame {
     
