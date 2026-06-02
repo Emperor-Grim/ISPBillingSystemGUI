@@ -50,7 +50,7 @@ public class ISPBillingSystem extends javax.swing.JFrame {
         
     //----------------------DASHBOARD MODIFICATION CUSTOM----------------------------------    
         //table Dashboard
-        String[] cols = {"ID","Full Name","Address","Plan","Balance","Status"};
+        String[] cols = {"ID","Full Name","Address","Plan","Balance","Status", "Due Month"};
         DefaultTableModel model = new DefaultTableModel(cols, 0) {
         public boolean isCellEditable(int r, int c) { return false; }
         };
@@ -60,10 +60,7 @@ public class ISPBillingSystem extends javax.swing.JFrame {
         styleStatusColumn(customerTable, 5);
         
         //table Customer Panel
-        String[] custCols = {"ID","Full Name","Address","Plan","Balance","Status"};
-        DefaultTableModel custModel = new DefaultTableModel(custCols, 0) {
-        public boolean isCellEditable(int r, int c) { return false; }
-        };
+
         
         custTable = styledTable(model);
         custScrollPane.setViewportView(custTable);
@@ -108,6 +105,8 @@ public class ISPBillingSystem extends javax.swing.JFrame {
         refreshCustomerTable();
         refreshDashboard();
     }
+    
+    
 }
 
     //=============other methods===============
@@ -129,8 +128,45 @@ public class ISPBillingSystem extends javax.swing.JFrame {
             c.getId(), c.getFullName(), c.getAddress(),
             c.getPlan(), String.format("₱%.2f", c.getBalance()), c.getStatus(), c.getDueDay()
         });
+    }  
     }
-}
+    
+    void refreshBillingTable() {
+        // 1. Grab the model from your NetBeans GUI variable
+        javax.swing.table.DefaultTableModel model = 
+            (javax.swing.table.DefaultTableModel) customerTable.getModel();
+        model.setRowCount(0); // Clear old visual rows safely
+        
+        java.time.LocalDate today = java.time.LocalDate.now();
+        
+        // 2. Pull from database and display unpaid items
+        for (Customer c : dao.getAllCustomers()) {
+            if ("Unpaid".equalsIgnoreCase(c.getStatus())) {
+                
+                // Assemble the current year/month with the customer's personal dueDay
+                java.time.LocalDate individualDueDate = java.time.LocalDate.of(
+                    today.getYear(), 
+                    today.getMonth(), 
+                    c.getDueDay()
+                );
+                
+                String displayStatus = c.getStatus();
+                if (today.isAfter(individualDueDate)) {
+                    displayStatus = "OVERDUE";
+                }
+                
+                // 3. Make sure the array entries match your visual column configuration perfectly!
+                model.addRow(new Object[]{
+                    c.getId(), 
+                    c.getFullName(), 
+                    c.getPlan(), 
+                    String.format("₱%.2f", c.getBalance()), 
+                    individualDueDate.toString(), // Pushes computed YYYY-MM-DD string
+                    displayStatus
+                });
+            }
+        }
+    }
     
     void styleStatusColumn(JTable tbl, int col) {
     tbl.getColumnModel().getColumn(col).setCellRenderer(new DefaultTableCellRenderer() {
