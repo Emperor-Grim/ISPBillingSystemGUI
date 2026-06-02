@@ -47,7 +47,7 @@ public class CustomerDAO {
         try {
             Connection conn = DBConnection.connect();
             if (conn == null) return false;
-            String sql = "INSERT INTO customers(firstName, lastName, address, plan, balance, status) VALUES (?,?,?,?,?,?,?)";
+            String sql = "INSERT INTO customers(firstName, lastName, address, plan, balance, status, dueDay) VALUES (?,?,?,?,?,?,?)";
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, c.getFirstName());
             stmt.setString(2, c.getLastName());

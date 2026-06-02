@@ -40,6 +40,7 @@ public class ISPBillingSystem extends javax.swing.JFrame {
     
     //database
     CustomerDAO dao = new CustomerDAO();
+    BillDAO billDao = new BillDAO();
     
     public ISPBillingSystem() {
         
@@ -73,6 +74,17 @@ public class ISPBillingSystem extends javax.swing.JFrame {
             String.format("₱%.2f", c2.getBalance()), c2.getStatus()});
         });
         
+        String[] billCols = {"ID","Customer","Period","Amount","Due Date","Paid Date","Status"};
+        DefaultTableModel billModel = new DefaultTableModel(billCols, 0) {
+        public boolean isCellEditable(int r, int c) { return false; }
+        };
+        billTable = styledTable(billModel);
+        billScrollPane.setViewportView(billTable);
+        styleStatusColumn(billTable, 6);
+        billScrollPane.setBorder(BorderFactory.createEmptyBorder());
+
+        refreshBillTable();
+        
         handlerTable.setBorder(BorderFactory.createLineBorder(BORDER_CLR));
         customerScrollPane.setBorder(BorderFactory.createEmptyBorder());
         
@@ -94,8 +106,8 @@ public class ISPBillingSystem extends javax.swing.JFrame {
         dao.addCustomer(dialog.getCustomer());
         refreshCustomerTable();
         refreshDashboard();
+        }
     }
-}
 
     void showEditCustomerDialog(Customer c) {
         CustomerDialog dialog = new CustomerDialog(this, c);
@@ -104,10 +116,8 @@ public class ISPBillingSystem extends javax.swing.JFrame {
         dao.updateCustomer(dialog.getCustomer());
         refreshCustomerTable();
         refreshDashboard();
+        } 
     }
-    
-    
-}
 
     //=============other methods===============
     void refreshDashboard() {
@@ -128,46 +138,35 @@ public class ISPBillingSystem extends javax.swing.JFrame {
             c.getId(), c.getFullName(), c.getAddress(),
             c.getPlan(), String.format("₱%.2f", c.getBalance()), c.getStatus(), c.getDueDay()
         });
-    }  
+        }  
     }
     
-    void refreshBillingTable() {
-        // 1. Grab the model from your NetBeans GUI variable
-        javax.swing.table.DefaultTableModel model = 
-            (javax.swing.table.DefaultTableModel) customerTable.getModel();
-        model.setRowCount(0); // Clear old visual rows safely
-        
-        java.time.LocalDate today = java.time.LocalDate.now();
-        
-        // 2. Pull from database and display unpaid items
-        for (Customer c : dao.getAllCustomers()) {
-            if ("Unpaid".equalsIgnoreCase(c.getStatus())) {
-                
-                // Assemble the current year/month with the customer's personal dueDay
-                java.time.LocalDate individualDueDate = java.time.LocalDate.of(
-                    today.getYear(), 
-                    today.getMonth(), 
-                    c.getDueDay()
-                );
-                
-                String displayStatus = c.getStatus();
-                if (today.isAfter(individualDueDate)) {
-                    displayStatus = "OVERDUE";
-                }
-                
-                // 3. Make sure the array entries match your visual column configuration perfectly!
-                model.addRow(new Object[]{
-                    c.getId(), 
-                    c.getFullName(), 
-                    c.getPlan(), 
-                    String.format("₱%.2f", c.getBalance()), 
-                    individualDueDate.toString(), // Pushes computed YYYY-MM-DD string
-                    displayStatus
-                });
-            }
+    void refreshBillTable() {
+    DefaultTableModel m = (DefaultTableModel) billTable.getModel();
+    m.setRowCount(0);
+    for (Bill b : billDao.getAllBills()) {
+        m.addRow(new Object[]{
+            b.getId(),
+            b.getCustomerName(),
+            b.getPeriod(),
+            String.format("₱%.2f", b.getAmount()),
+            b.getDueDate(),
+            b.getPaidDate() != null ? b.getPaidDate().toString() : "—",
+            b.getStatus()
+        });
         }
     }
     
+    void showGenerateBillDialog() {
+    BillDialog dialog = new BillDialog(this, true); 
+    dialog.setVisible(true);
+        if (dialog.isSaved()) {
+            billDao.addBill(dialog.getBill());
+            refreshBillTable();
+            refreshCustomerTable();
+            refreshDashboard();
+        }
+    }
     void styleStatusColumn(JTable tbl, int col) {
     tbl.getColumnModel().getColumn(col).setCellRenderer(new DefaultTableCellRenderer() {
         @Override
@@ -211,7 +210,7 @@ public class ISPBillingSystem extends javax.swing.JFrame {
     });
     }   
     
-        JTable styledTable(DefaultTableModel model){
+    JTable styledTable(DefaultTableModel model){
             JTable table = new JTable(model);
             table.setFont(new Font("SansSerif", Font.PLAIN,12));
             table.setRowHeight(28); table.setShowGrid(false); table.setIntercellSpacing(new Dimension(0,0));
@@ -286,20 +285,16 @@ public class ISPBillingSystem extends javax.swing.JFrame {
         custTable = new javax.swing.JTable();
         billingPanel = new javax.swing.JPanel();
         lblBillingHeader = new javax.swing.JLabel();
-        billCenterPanel = new javax.swing.JPanel();
-        formCardBorder = new javax.swing.JPanel();
-        formCard = new javax.swing.JPanel();
-        jLabel3 = new javax.swing.JLabel();
-        billFirst = new javax.swing.JTextField();
-        jLabel5 = new javax.swing.JLabel();
-        billLast = new javax.swing.JTextField();
-        JLabel3 = new javax.swing.JLabel();
-        billAddr = new javax.swing.JTextField();
-        JLabel4 = new javax.swing.JLabel();
-        billPlan = new javax.swing.JComboBox<>();
-        JLabel5 = new javax.swing.JLabel();
-        billPeriod = new javax.swing.JTextField();
-        billCenterPanel4 = new javax.swing.JPanel();
+        handlerBilling = new javax.swing.JPanel();
+        billToolBar = new javax.swing.JPanel();
+        billSearchField = new javax.swing.JTextField();
+        generateBillBtn = new javax.swing.JButton();
+        markBillPaidBtn = new javax.swing.JButton();
+        deleteBillBtn = new javax.swing.JButton();
+        refreshBillBtn = new javax.swing.JButton();
+        billTableHandler = new javax.swing.JPanel();
+        billScrollPane = new javax.swing.JScrollPane();
+        billTable = new javax.swing.JTable();
         receiptsPanel = new javax.swing.JPanel();
         reportsPanel = new javax.swing.JPanel();
 
@@ -755,70 +750,82 @@ public class ISPBillingSystem extends javax.swing.JFrame {
         lblBillingHeader.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         billingPanel.add(lblBillingHeader, java.awt.BorderLayout.PAGE_START);
 
-        billCenterPanel.setBackground(new java.awt.Color(245, 247, 250));
-        billCenterPanel.setLayout(new java.awt.GridLayout(1, 2, 8, 0));
+        handlerBilling.setBackground(new java.awt.Color(255, 255, 255));
+        handlerBilling.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(220, 225, 235), 1, true));
+        handlerBilling.setLayout(new java.awt.BorderLayout());
 
-        formCardBorder.setBackground(new java.awt.Color(255, 255, 255));
-        formCardBorder.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(220, 225, 235), 1, true));
-        formCardBorder.setLayout(new java.awt.BorderLayout());
+        billToolBar.setBackground(new java.awt.Color(255, 255, 255));
+        billToolBar.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 5, 10, 0));
+        billToolBar.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 8, 0));
 
-        formCard.setBackground(new java.awt.Color(255, 255, 255));
-        formCard.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEmptyBorder(12, 12, 12, 12), "Bill Details", javax.swing.border.TitledBorder.LEFT, javax.swing.border.TitledBorder.BELOW_TOP, new java.awt.Font("SansSerif", 1, 14), new java.awt.Color(0, 0, 0))); // NOI18N
-        formCard.setLayout(new java.awt.GridLayout(7, 2, 8, 0));
+        billSearchField.setColumns(22);
+        billSearchField.setFont(new java.awt.Font("SansSerif", 0, 12)); // NOI18N
+        billSearchField.setCursor(new java.awt.Cursor(java.awt.Cursor.TEXT_CURSOR));
+        billSearchField.addActionListener(this::billSearchFieldActionPerformed);
+        billToolBar.add(billSearchField);
 
-        jLabel3.setFont(new java.awt.Font("SansSerif", 0, 12)); // NOI18N
-        jLabel3.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel3.setText("First Name:");
-        formCard.add(jLabel3);
+        generateBillBtn.setBackground(new java.awt.Color(230, 241, 251));
+        generateBillBtn.setFont(new java.awt.Font("SansSerif", 0, 12)); // NOI18N
+        generateBillBtn.setForeground(new java.awt.Color(12, 68, 124));
+        generateBillBtn.setText("+ Add");
+        generateBillBtn.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 8, 5, 8));
+        generateBillBtn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        generateBillBtn.addActionListener(this::generateBillBtnActionPerformed);
+        billToolBar.add(generateBillBtn);
 
-        billFirst.setColumns(15);
-        billFirst.setFont(new java.awt.Font("SansSerif", 0, 12)); // NOI18N
-        formCard.add(billFirst);
+        markBillPaidBtn.setBackground(new java.awt.Color(234, 243, 222));
+        markBillPaidBtn.setFont(new java.awt.Font("SansSerif", 0, 12)); // NOI18N
+        markBillPaidBtn.setForeground(new java.awt.Color(39, 80, 10));
+        markBillPaidBtn.setText("Mark Paid");
+        markBillPaidBtn.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 8, 5, 8));
+        markBillPaidBtn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        markBillPaidBtn.addActionListener(this::markBillPaidBtnActionPerformed);
+        billToolBar.add(markBillPaidBtn);
 
-        jLabel5.setFont(new java.awt.Font("SansSerif", 0, 12)); // NOI18N
-        jLabel5.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel5.setText("Last Name:");
-        formCard.add(jLabel5);
+        deleteBillBtn.setBackground(new java.awt.Color(252, 235, 235));
+        deleteBillBtn.setFont(new java.awt.Font("SansSerif", 0, 12)); // NOI18N
+        deleteBillBtn.setForeground(new java.awt.Color(163, 45, 45));
+        deleteBillBtn.setText("Delete");
+        deleteBillBtn.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 8, 5, 8));
+        deleteBillBtn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        deleteBillBtn.addActionListener(this::deleteBillBtnActionPerformed);
+        billToolBar.add(deleteBillBtn);
 
-        billLast.setColumns(15);
-        billLast.setFont(new java.awt.Font("SansSerif", 0, 12)); // NOI18N
-        formCard.add(billLast);
+        refreshBillBtn.setBackground(new java.awt.Color(255, 255, 255));
+        refreshBillBtn.setFont(new java.awt.Font("SansSerif", 0, 12)); // NOI18N
+        refreshBillBtn.setForeground(new java.awt.Color(30, 40, 55));
+        refreshBillBtn.setText("Refresh");
+        refreshBillBtn.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 8, 5, 8));
+        refreshBillBtn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        refreshBillBtn.addActionListener(this::refreshBillBtnActionPerformed);
+        billToolBar.add(refreshBillBtn);
 
-        JLabel3.setFont(new java.awt.Font("SansSerif", 0, 12)); // NOI18N
-        JLabel3.setForeground(new java.awt.Color(0, 0, 0));
-        JLabel3.setText("Address: ");
-        formCard.add(JLabel3);
+        handlerBilling.add(billToolBar, java.awt.BorderLayout.NORTH);
 
-        billAddr.setFont(new java.awt.Font("SansSerif", 0, 12)); // NOI18N
-        formCard.add(billAddr);
+        billTableHandler.setBackground(new java.awt.Color(255, 255, 255));
+        billTableHandler.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 12, 10, 12));
+        billTableHandler.setLayout(new java.awt.BorderLayout());
 
-        JLabel4.setFont(new java.awt.Font("SansSerif", 0, 12)); // NOI18N
-        JLabel4.setForeground(new java.awt.Color(0, 0, 0));
-        JLabel4.setText("Plan:");
-        formCard.add(JLabel4);
+        billScrollPane.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
 
-        billPlan.setFont(new java.awt.Font("SansSerif", 0, 12)); // NOI18N
-        billPlan.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Basic", "Standard", "Premium", "VIP" }));
-        formCard.add(billPlan);
+        billTable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        billScrollPane.setViewportView(billTable);
 
-        JLabel5.setFont(new java.awt.Font("SansSerif", 0, 12)); // NOI18N
-        JLabel5.setForeground(new java.awt.Color(0, 0, 0));
-        JLabel5.setText("Billing Period");
-        formCard.add(JLabel5);
+        billTableHandler.add(billScrollPane, java.awt.BorderLayout.CENTER);
 
-        billPeriod.setFont(new java.awt.Font("SansSerif", 0, 12)); // NOI18N
-        formCard.add(billPeriod);
+        handlerBilling.add(billTableHandler, java.awt.BorderLayout.CENTER);
 
-        formCardBorder.add(formCard, java.awt.BorderLayout.CENTER);
-
-        billCenterPanel.add(formCardBorder);
-
-        billCenterPanel4.setBackground(new java.awt.Color(255, 255, 255));
-        billCenterPanel4.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(220, 225, 235), 1, true));
-        billCenterPanel4.setLayout(new java.awt.GridLayout());
-        billCenterPanel.add(billCenterPanel4);
-
-        billingPanel.add(billCenterPanel, java.awt.BorderLayout.CENTER);
+        billingPanel.add(handlerBilling, java.awt.BorderLayout.CENTER);
 
         contentPanel.add(billingPanel, "billing");
 
@@ -984,6 +991,69 @@ public class ISPBillingSystem extends javax.swing.JFrame {
         refreshDashboard();
     }//GEN-LAST:event_refBtn1ActionPerformed
 
+    private void billSearchFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_billSearchFieldActionPerformed
+        String query = billSearchField.getText().trim().toLowerCase();
+    
+        DefaultTableModel m = (DefaultTableModel) billTable.getModel();
+    
+        m.setRowCount(0);
+        
+        for (Bill b : billDao.getAllBills()) {
+            if (b.getCustomerName().toLowerCase().contains(query) ||
+                b.getPeriod().toLowerCase().contains(query)) {
+                m.addRow(new Object[]{
+                    b.getId(), b.getCustomerName(), b.getPeriod(),
+                    String.format("₱%.2f", b.getAmount()),
+                    b.getDueDate(),
+                    b.getPaidDate() != null ? b.getPaidDate().toString() : "—",
+                    b.getStatus()
+                });
+            }
+        }
+    }//GEN-LAST:event_billSearchFieldActionPerformed
+
+    private void generateBillBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_generateBillBtnActionPerformed
+        showGenerateBillDialog();
+    }//GEN-LAST:event_generateBillBtnActionPerformed
+
+    private void deleteBillBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteBillBtnActionPerformed
+        int row = billTable.getSelectedRow();
+        if (row == -1) { 
+            JOptionPane.showMessageDialog(this, "Select a bill first."); 
+            return; }
+        int id = (int) billTable.getValueAt(row, 0);
+        
+        int confirm = JOptionPane.showConfirmDialog(this, "Delete this bill?", "Confirm", JOptionPane.YES_NO_OPTION);
+        
+        if (confirm == JOptionPane.YES_OPTION) {
+        billDao.deleteBill(id);
+        refreshBillTable();
+    }
+    }//GEN-LAST:event_deleteBillBtnActionPerformed
+
+    private void markBillPaidBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_markBillPaidBtnActionPerformed
+    int row = billTable.getSelectedRow();
+    if (row == -1) { 
+        JOptionPane.showMessageDialog(this, "Select a bill first."); 
+        return; }
+    
+    int id = (int) billTable.getValueAt(row, 0);
+    
+    int confirm = JOptionPane.showConfirmDialog(this, "Mark this bill as paid?", "Confirm", JOptionPane.YES_NO_OPTION);
+    
+    if (confirm == JOptionPane.YES_OPTION) {
+        billDao.payBill(id);
+        refreshBillTable();
+        refreshCustomerTable();
+        refreshDashboard();
+    }
+    }//GEN-LAST:event_markBillPaidBtnActionPerformed
+
+    private void refreshBillBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshBillBtnActionPerformed
+        billSearchField.setText("");
+        refreshBillTable();
+    }//GEN-LAST:event_refreshBillBtnActionPerformed
+
     
     
     public static void main(String args[]) {
@@ -991,17 +1061,12 @@ public class ISPBillingSystem extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel JLabel3;
-    private javax.swing.JLabel JLabel4;
-    private javax.swing.JLabel JLabel5;
     private javax.swing.JButton addBtn;
-    private javax.swing.JTextField billAddr;
-    private javax.swing.JPanel billCenterPanel;
-    private javax.swing.JPanel billCenterPanel4;
-    private javax.swing.JTextField billFirst;
-    private javax.swing.JTextField billLast;
-    private javax.swing.JTextField billPeriod;
-    private javax.swing.JComboBox<String> billPlan;
+    private javax.swing.JScrollPane billScrollPane;
+    private javax.swing.JTextField billSearchField;
+    private javax.swing.JTable billTable;
+    private javax.swing.JPanel billTableHandler;
+    private javax.swing.JPanel billToolBar;
     private javax.swing.JPanel billingPanel;
     private javax.swing.JLabel bl;
     private javax.swing.JPanel bodyPanel;
@@ -1033,16 +1098,15 @@ public class ISPBillingSystem extends javax.swing.JFrame {
     private javax.swing.JPanel dashCenterPanel;
     private javax.swing.JPanel dashboardPanel;
     private javax.swing.JButton delBtn;
+    private javax.swing.JButton deleteBillBtn;
     private javax.swing.JLabel dl;
     private javax.swing.JButton editBtn;
-    private javax.swing.JPanel formCard;
-    private javax.swing.JPanel formCardBorder;
+    private javax.swing.JButton generateBillBtn;
+    private javax.swing.JPanel handlerBilling;
     private javax.swing.JPanel handlerCustomer;
     private javax.swing.JPanel handlerTable;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel lblBalance;
     private javax.swing.JLabel lblBillingHeader;
@@ -1052,11 +1116,13 @@ public class ISPBillingSystem extends javax.swing.JFrame {
     private javax.swing.JLabel lblTotal;
     private javax.swing.JLabel lblUnpaid;
     private javax.swing.JPanel logo;
+    private javax.swing.JButton markBillPaidBtn;
     private javax.swing.JLabel n;
     private javax.swing.JButton payBtn;
     private javax.swing.JPanel receiptsPanel;
     private javax.swing.JButton refBtn;
     private javax.swing.JButton refBtn1;
+    private javax.swing.JButton refreshBillBtn;
     private javax.swing.JPanel reportsPanel;
     private javax.swing.JTextField searchField;
     private javax.swing.JLabel statusBalance;

@@ -28,7 +28,7 @@ public class CustomerDialog extends javax.swing.JDialog {
         setTitle("Edit Customer");
         fFirst.setText(c.getFirstName());
         fLast.setText(c.getLastName());
-        JLabel3.setText(c.getAddress());
+        fAddr.setText(c.getAddress());
         fPlan.setSelectedItem(c.getPlan());
         fBal.setText(String.valueOf(c.getBalance()));
         fStatus.setSelectedItem(c.getStatus());
