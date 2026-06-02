@@ -127,7 +127,7 @@ public class ISPBillingSystem extends javax.swing.JFrame {
     for (Customer c : dao.getAllCustomers()) {
         model.addRow(new Object[]{
             c.getId(), c.getFullName(), c.getAddress(),
-            c.getPlan(), String.format("₱%.2f", c.getBalance()), c.getStatus()
+            c.getPlan(), String.format("₱%.2f", c.getBalance()), c.getStatus(), c.getDueDay()
         });
     }
 }
@@ -156,6 +156,10 @@ public class ISPBillingSystem extends javax.swing.JFrame {
                     case "Unpaid":
                         setBackground(RED_LIGHT); 
                         setForeground(RED_DARK);
+                        break;
+                    case "OVERDUE": 
+                        setBackground(new Color(254, 226, 226)); 
+                        setForeground(new Color(153, 27, 27));  
                         break;
                     default:
                         setBackground(t.getBackground());
@@ -245,6 +249,21 @@ public class ISPBillingSystem extends javax.swing.JFrame {
         custScrollPane = new javax.swing.JScrollPane();
         custTable = new javax.swing.JTable();
         billingPanel = new javax.swing.JPanel();
+        lblBillingHeader = new javax.swing.JLabel();
+        billCenterPanel = new javax.swing.JPanel();
+        formCardBorder = new javax.swing.JPanel();
+        formCard = new javax.swing.JPanel();
+        jLabel3 = new javax.swing.JLabel();
+        billFirst = new javax.swing.JTextField();
+        jLabel5 = new javax.swing.JLabel();
+        billLast = new javax.swing.JTextField();
+        JLabel3 = new javax.swing.JLabel();
+        billAddr = new javax.swing.JTextField();
+        JLabel4 = new javax.swing.JLabel();
+        billPlan = new javax.swing.JComboBox<>();
+        JLabel5 = new javax.swing.JLabel();
+        billPeriod = new javax.swing.JTextField();
+        billCenterPanel4 = new javax.swing.JPanel();
         receiptsPanel = new javax.swing.JPanel();
         reportsPanel = new javax.swing.JPanel();
 
@@ -515,7 +534,7 @@ public class ISPBillingSystem extends javax.swing.JFrame {
         dSpacer.setLayout(dSpacerLayout);
         dSpacerLayout.setHorizontalGroup(
             dSpacerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 894, Short.MAX_VALUE)
+            .addGap(0, 940, Short.MAX_VALUE)
         );
         dSpacerLayout.setVerticalGroup(
             dSpacerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -689,7 +708,82 @@ public class ISPBillingSystem extends javax.swing.JFrame {
         contentPanel.add(customerPanel, "customers");
 
         billingPanel.setBackground(new java.awt.Color(245, 247, 250));
-        billingPanel.setLayout(new java.awt.GridBagLayout());
+        billingPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(14, 14, 14, 14));
+        billingPanel.setForeground(new java.awt.Color(245, 247, 250));
+        billingPanel.setLayout(new java.awt.BorderLayout());
+
+        lblBillingHeader.setFont(new java.awt.Font("SansSerif", 1, 18)); // NOI18N
+        lblBillingHeader.setForeground(new java.awt.Color(30, 40, 55));
+        lblBillingHeader.setText("Generate Bill");
+        lblBillingHeader.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 12, 0));
+        lblBillingHeader.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        billingPanel.add(lblBillingHeader, java.awt.BorderLayout.PAGE_START);
+
+        billCenterPanel.setBackground(new java.awt.Color(245, 247, 250));
+        billCenterPanel.setLayout(new java.awt.GridLayout(1, 2, 8, 0));
+
+        formCardBorder.setBackground(new java.awt.Color(255, 255, 255));
+        formCardBorder.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(220, 225, 235), 1, true));
+        formCardBorder.setLayout(new java.awt.BorderLayout());
+
+        formCard.setBackground(new java.awt.Color(255, 255, 255));
+        formCard.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEmptyBorder(12, 12, 12, 12), "Bill Details", javax.swing.border.TitledBorder.LEFT, javax.swing.border.TitledBorder.BELOW_TOP, new java.awt.Font("SansSerif", 1, 14), new java.awt.Color(0, 0, 0))); // NOI18N
+        formCard.setLayout(new java.awt.GridLayout(7, 2, 8, 0));
+
+        jLabel3.setFont(new java.awt.Font("SansSerif", 0, 12)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel3.setText("First Name:");
+        formCard.add(jLabel3);
+
+        billFirst.setColumns(15);
+        billFirst.setFont(new java.awt.Font("SansSerif", 0, 12)); // NOI18N
+        formCard.add(billFirst);
+
+        jLabel5.setFont(new java.awt.Font("SansSerif", 0, 12)); // NOI18N
+        jLabel5.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel5.setText("Last Name:");
+        formCard.add(jLabel5);
+
+        billLast.setColumns(15);
+        billLast.setFont(new java.awt.Font("SansSerif", 0, 12)); // NOI18N
+        formCard.add(billLast);
+
+        JLabel3.setFont(new java.awt.Font("SansSerif", 0, 12)); // NOI18N
+        JLabel3.setForeground(new java.awt.Color(0, 0, 0));
+        JLabel3.setText("Address: ");
+        formCard.add(JLabel3);
+
+        billAddr.setFont(new java.awt.Font("SansSerif", 0, 12)); // NOI18N
+        formCard.add(billAddr);
+
+        JLabel4.setFont(new java.awt.Font("SansSerif", 0, 12)); // NOI18N
+        JLabel4.setForeground(new java.awt.Color(0, 0, 0));
+        JLabel4.setText("Plan:");
+        formCard.add(JLabel4);
+
+        billPlan.setFont(new java.awt.Font("SansSerif", 0, 12)); // NOI18N
+        billPlan.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Basic", "Standard", "Premium", "VIP" }));
+        formCard.add(billPlan);
+
+        JLabel5.setFont(new java.awt.Font("SansSerif", 0, 12)); // NOI18N
+        JLabel5.setForeground(new java.awt.Color(0, 0, 0));
+        JLabel5.setText("Billing Period");
+        formCard.add(JLabel5);
+
+        billPeriod.setFont(new java.awt.Font("SansSerif", 0, 12)); // NOI18N
+        formCard.add(billPeriod);
+
+        formCardBorder.add(formCard, java.awt.BorderLayout.CENTER);
+
+        billCenterPanel.add(formCardBorder);
+
+        billCenterPanel4.setBackground(new java.awt.Color(255, 255, 255));
+        billCenterPanel4.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(220, 225, 235), 1, true));
+        billCenterPanel4.setLayout(new java.awt.GridLayout());
+        billCenterPanel.add(billCenterPanel4);
+
+        billingPanel.add(billCenterPanel, java.awt.BorderLayout.CENTER);
+
         contentPanel.add(billingPanel, "billing");
 
         receiptsPanel.setBackground(new java.awt.Color(245, 247, 250));
@@ -714,6 +808,7 @@ public class ISPBillingSystem extends javax.swing.JFrame {
         
         java.awt.CardLayout cl = (java.awt.CardLayout) contentPanel.getLayout();
         cl.show(contentPanel, "dashboard");
+        refreshCustomerTable();
     }//GEN-LAST:event_btnDashboardMouseClicked
 
     private void btnDashboardMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnDashboardMouseEntered
@@ -860,7 +955,17 @@ public class ISPBillingSystem extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel JLabel3;
+    private javax.swing.JLabel JLabel4;
+    private javax.swing.JLabel JLabel5;
     private javax.swing.JButton addBtn;
+    private javax.swing.JTextField billAddr;
+    private javax.swing.JPanel billCenterPanel;
+    private javax.swing.JPanel billCenterPanel4;
+    private javax.swing.JTextField billFirst;
+    private javax.swing.JTextField billLast;
+    private javax.swing.JTextField billPeriod;
+    private javax.swing.JComboBox<String> billPlan;
     private javax.swing.JPanel billingPanel;
     private javax.swing.JLabel bl;
     private javax.swing.JPanel bodyPanel;
@@ -894,12 +999,17 @@ public class ISPBillingSystem extends javax.swing.JFrame {
     private javax.swing.JButton delBtn;
     private javax.swing.JLabel dl;
     private javax.swing.JButton editBtn;
+    private javax.swing.JPanel formCard;
+    private javax.swing.JPanel formCardBorder;
     private javax.swing.JPanel handlerCustomer;
     private javax.swing.JPanel handlerTable;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel lblBalance;
+    private javax.swing.JLabel lblBillingHeader;
     private javax.swing.JLabel lblCustomerHeader;
     private javax.swing.JLabel lblDashboardHeader;
     private javax.swing.JLabel lblPaid;

@@ -8,9 +8,9 @@ public class Customer {
     private String plan;
     private double balance;
     private String status;
+    private int dueDay;
 
-    public Customer(int id, String firstName, String lastName, String address,
-                    String plan, double balance, String status) {
+    public Customer(int id, String firstName, String lastName, String address, String plan, double balance, String status, int dueDay) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -18,6 +18,7 @@ public class Customer {
         this.plan = plan;
         this.balance = balance;
         this.status = status;
+        this.dueDay = dueDay;
     }
 
     public Customer() {}
@@ -42,6 +43,9 @@ public class Customer {
 
     public void setStatus(String status)       { this.status = status; }
     public String getStatus()                  { return status; }
+    
+    public int getDueDay() { return dueDay; }
+    public void setDueDay(int dueDay) { this.dueDay = dueDay; }
 
     public String getFullName() { return firstName + " " + lastName; }
 }

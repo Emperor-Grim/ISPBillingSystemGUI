@@ -23,7 +23,8 @@ public class CustomerDAO {
                     rs.getString("address"),
                     rs.getString("plan"),
                     rs.getDouble("balance"),
-                    rs.getString("status")
+                    rs.getString("status"),
+                    rs.getInt("dueDay")
                 ));
             }
             conn.close();
@@ -46,7 +47,7 @@ public class CustomerDAO {
         try {
             Connection conn = DBConnection.connect();
             if (conn == null) return false;
-            String sql = "INSERT INTO customers(firstName, lastName, address, plan, balance, status) VALUES (?,?,?,?,?,?)";
+            String sql = "INSERT INTO customers(firstName, lastName, address, plan, balance, status) VALUES (?,?,?,?,?,?,?)";
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, c.getFirstName());
             stmt.setString(2, c.getLastName());
@@ -54,6 +55,7 @@ public class CustomerDAO {
             stmt.setString(4, c.getPlan());
             stmt.setDouble(5, c.getBalance());
             stmt.setString(6, c.getStatus());
+            stmt.setInt(7, c.getDueDay());
             stmt.executeUpdate();
             conn.close();
             return true;
@@ -68,7 +70,7 @@ public class CustomerDAO {
         try {
             Connection conn = DBConnection.connect();
             if (conn == null) return false;
-            String sql = "UPDATE customers SET firstName=?, lastName=?, address=?, plan=?, balance=?, status=? WHERE id=?";
+            String sql = "UPDATE customers SET firstName=?, lastName=?, address=?, plan=?, balance=?, status=?, dueDay=? WHERE id=?";
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, c.getFirstName());
             stmt.setString(2, c.getLastName());
@@ -76,7 +78,8 @@ public class CustomerDAO {
             stmt.setString(4, c.getPlan());
             stmt.setDouble(5, c.getBalance());
             stmt.setString(6, c.getStatus());
-            stmt.setInt(7, c.getId());
+            stmt.setInt(7, c.getDueDay());
+            stmt.setInt(8, c.getId());
             int rows = stmt.executeUpdate();
             conn.close();
             return rows > 0;
@@ -181,7 +184,8 @@ public class CustomerDAO {
                 rs.getString("address"),
                 rs.getString("plan"),
                 rs.getDouble("balance"),
-                rs.getString("status")
+                rs.getString("status"),
+                rs.getInt("dueDay")    
             );
             conn.close();
             return c;
