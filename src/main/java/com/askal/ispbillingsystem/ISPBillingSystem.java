@@ -75,7 +75,7 @@ public class ISPBillingSystem extends javax.swing.JFrame {
         DefaultTableModel custmodel = new DefaultTableModel(cols, 0) {
             public boolean isCellEditable(int r, int c) { return false; }
         };
-        custTable = styledTable(custmodel);
+        custTable = styledTable(model);
         custScrollPane.setViewportView(custTable);
         styleStatusColumn(custTable, 5);
         
@@ -94,9 +94,7 @@ public class ISPBillingSystem extends javax.swing.JFrame {
         billScrollPane.setViewportView(billTable);
         styleStatusColumn(billTable, 6);
         billScrollPane.setBorder(BorderFactory.createEmptyBorder());
-
-        refreshBillTable();
-        
+  
         handlerTable.setBorder(BorderFactory.createLineBorder(BORDER_CLR));
         customerScrollPane.setBorder(BorderFactory.createEmptyBorder());
         
@@ -107,7 +105,7 @@ public class ISPBillingSystem extends javax.swing.JFrame {
         searchField.setToolTipText("Search by name...");
         
         refreshDashboard();
-        refreshCustomerTable();
+        refreshBillTable();
     }
     
     //-----------JDialogs----------------------
@@ -126,6 +124,7 @@ public class ISPBillingSystem extends javax.swing.JFrame {
         dialog.setVisible(true);
     if (dialog.isSaved()) {
         dao.updateCustomer(dialog.getCustomer());
+        
         refreshCustomerTable();
         refreshDashboard();
         } 
@@ -154,6 +153,12 @@ public class ISPBillingSystem extends javax.swing.JFrame {
     }
     
     void refreshBillTable() {
+        SwingUtilities.invokeLater(() -> {
+            statusTotal.setText(String.valueOf(dao.getTotalCustomers()));
+            statusPaid.setText(String.valueOf(dao.getPaidCount()));
+            statusUnpaid.setText(String.valueOf(dao.getUnpaidCount()));
+            statusBalance.setText(String.format("₱%.0f", dao.getTotalBalance()));
+        });
     DefaultTableModel m = (DefaultTableModel) billTable.getModel();
     m.setRowCount(0);
     for (Bill b : billDao.getAllBills()) {
@@ -1219,7 +1224,9 @@ public class ISPBillingSystem extends javax.swing.JFrame {
                 amount,
                 selectedCustomer
             );
-            cl.show(contentPanel, "receipts");
+            cl.show(contentPanel, "billing");
+            contentPanel.revalidate();
+            contentPanel.repaint();
         }
         
 
