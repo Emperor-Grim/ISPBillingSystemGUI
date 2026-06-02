@@ -71,11 +71,8 @@ public class ISPBillingSystem extends javax.swing.JFrame {
         customerScrollPane.setViewportView(customerTable);
         styleStatusColumn(customerTable, 5);
         
-        //table Customer Panel
-        DefaultTableModel custmodel = new DefaultTableModel(cols, 0) {
-            public boolean isCellEditable(int r, int c) { return false; }
-        };
-        custTable = styledTable(custmodel);
+
+        custTable = styledTable(model);
         custScrollPane.setViewportView(custTable);
         styleStatusColumn(custTable, 5);
         
@@ -1105,6 +1102,9 @@ public class ISPBillingSystem extends javax.swing.JFrame {
                 });
             }
         }
+        
+        
+        
     }//GEN-LAST:event_billSearchFieldActionPerformed
 
     private void generateBillBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_generateBillBtnActionPerformed
@@ -1201,7 +1201,6 @@ public class ISPBillingSystem extends javax.swing.JFrame {
                 billTable.getValueAt(row,3).toString();
 
         Customer selectedCustomer = null;
-
         for(Customer c : dao.getAllCustomers()){
 
             if(c.getFullName().equals(customer)){
@@ -1209,7 +1208,6 @@ public class ISPBillingSystem extends javax.swing.JFrame {
                 break;
             }
         }
-
         if(selectedCustomer != null){
             updateReceiptPreview(
                 customer,
