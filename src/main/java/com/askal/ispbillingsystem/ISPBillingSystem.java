@@ -289,10 +289,6 @@ public class ISPBillingSystem extends javax.swing.JFrame {
         cl = new javax.swing.JLabel();
         btnBilling = new javax.swing.JPanel();
         bl = new javax.swing.JLabel();
-        btnReceipts = new javax.swing.JPanel();
-        brec = new javax.swing.JLabel();
-        btnReports = new javax.swing.JPanel();
-        brep = new javax.swing.JLabel();
         contentPanel = new javax.swing.JPanel();
         dashboardPanel = new javax.swing.JPanel();
         lblDashboardHeader = new javax.swing.JLabel();
@@ -477,50 +473,6 @@ public class ISPBillingSystem extends javax.swing.JFrame {
         btnBilling.add(bl);
 
         buildSideBar.add(btnBilling);
-
-        btnReceipts.setBackground(new java.awt.Color(12, 68, 124));
-        btnReceipts.setMaximumSize(new java.awt.Dimension(225, 36));
-        btnReceipts.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                btnReceiptsMouseClicked(evt);
-            }
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                btnReceiptsMouseEntered(evt);
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                btnReceiptsMouseExited(evt);
-            }
-        });
-        btnReceipts.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 12, 8));
-
-        brec.setFont(new java.awt.Font("SansSerif", 0, 14)); // NOI18N
-        brec.setForeground(new java.awt.Color(230, 241, 251));
-        brec.setText("Receipts");
-        btnReceipts.add(brec);
-
-        buildSideBar.add(btnReceipts);
-
-        btnReports.setBackground(new java.awt.Color(12, 68, 124));
-        btnReports.setMaximumSize(new java.awt.Dimension(225, 36));
-        btnReports.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                btnReportsMouseClicked(evt);
-            }
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                btnReportsMouseEntered(evt);
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                btnReportsMouseExited(evt);
-            }
-        });
-        btnReports.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 12, 8));
-
-        brep.setFont(new java.awt.Font("SansSerif", 0, 14)); // NOI18N
-        brep.setForeground(new java.awt.Color(230, 241, 251));
-        brep.setText("Reports");
-        btnReports.add(brep);
-
-        buildSideBar.add(btnReports);
 
         bodyPanel.add(buildSideBar, java.awt.BorderLayout.LINE_START);
 
@@ -998,40 +950,6 @@ public class ISPBillingSystem extends javax.swing.JFrame {
         if (btnBilling != activeSideBtn) btnBilling.setBackground(new java.awt.Color(12, 68, 124));
     }//GEN-LAST:event_btnBillingMouseExited
 
-    private void btnReceiptsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnReceiptsMouseClicked
-        if (activeSideBtn != null) activeSideBtn.setBackground(new java.awt.Color(12, 68, 124));
-        activeSideBtn = btnReceipts;
-        btnReceipts.setBackground(new java.awt.Color(40, 90, 137));
-        
-        java.awt.CardLayout cl = (java.awt.CardLayout) contentPanel.getLayout();
-        cl.show(contentPanel, "receipts");
-    }//GEN-LAST:event_btnReceiptsMouseClicked
-
-    private void btnReceiptsMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnReceiptsMouseEntered
-       if (btnReceipts != activeSideBtn) btnReceipts.setBackground(new java.awt.Color(40, 100, 170));
-    }//GEN-LAST:event_btnReceiptsMouseEntered
-
-    private void btnReceiptsMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnReceiptsMouseExited
-        if (btnReceipts != activeSideBtn) btnReceipts.setBackground(new java.awt.Color(12, 68, 124));
-    }//GEN-LAST:event_btnReceiptsMouseExited
-
-    private void btnReportsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnReportsMouseClicked
-        if (activeSideBtn != null) activeSideBtn.setBackground(new java.awt.Color(12, 68, 124));
-        activeSideBtn = btnReports;
-        btnReports.setBackground(new java.awt.Color(40, 90, 137));
-        
-        java.awt.CardLayout cl = (java.awt.CardLayout) contentPanel.getLayout();
-        cl.show(contentPanel, "reports");
-    }//GEN-LAST:event_btnReportsMouseClicked
-
-    private void btnReportsMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnReportsMouseEntered
-        if (btnReports != activeSideBtn) btnReports.setBackground(new java.awt.Color(40, 100, 170));
-    }//GEN-LAST:event_btnReportsMouseEntered
-
-    private void btnReportsMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnReportsMouseExited
-        if (btnReports != activeSideBtn) btnReports.setBackground(new java.awt.Color(12, 68, 124));
-    }//GEN-LAST:event_btnReportsMouseExited
-
     private void searchFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchFieldActionPerformed
         String query = searchField.getText().trim().toLowerCase();
         DefaultTableModel m = (DefaultTableModel) custTable.getModel();
@@ -1248,13 +1166,9 @@ public class ISPBillingSystem extends javax.swing.JFrame {
     private javax.swing.JPanel billingPanel;
     private javax.swing.JLabel bl;
     private javax.swing.JPanel bodyPanel;
-    private javax.swing.JLabel brec;
-    private javax.swing.JLabel brep;
     private javax.swing.JPanel btnBilling;
     private javax.swing.JPanel btnCustomers;
     private javax.swing.JPanel btnDashboard;
-    private javax.swing.JPanel btnReceipts;
-    private javax.swing.JPanel btnReports;
     private javax.swing.JPanel buildSideBar;
     private javax.swing.JPanel buildTopBar;
     private javax.swing.JPanel cardBalance;
