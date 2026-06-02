@@ -1349,6 +1349,31 @@
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="expBtnActionPerformed"/>
                           </Events>
                         </Component>
+                        <Component class="javax.swing.JButton" name="generateReceiptBtn">
+                          <Properties>
+                            <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                              <Color blue="de" green="f3" red="ea" type="rgb"/>
+                            </Property>
+                            <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                              <Font name="SansSerif" size="12" style="0"/>
+                            </Property>
+                            <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                              <Color blue="a" green="50" red="27" type="rgb"/>
+                            </Property>
+                            <Property name="text" type="java.lang.String" value="Generate Receipt"/>
+                            <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+                              <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
+                                <EmptyBorder bottom="5" left="8" right="8" top="5"/>
+                              </Border>
+                            </Property>
+                            <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
+                              <Color id="Hand Cursor"/>
+                            </Property>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="generateReceiptBtnActionPerformed"/>
+                          </Events>
+                        </Component>
                       </SubComponents>
                     </Container>
                     <Container class="javax.swing.JPanel" name="billTableHandler">
@@ -1480,6 +1505,9 @@
                                             <Property name="columns" type="int" value="20"/>
                                             <Property name="rows" type="int" value="5"/>
                                           </Properties>
+                                          <AccessibilityProperties>
+                                            <Property name="AccessibleContext.accessibleDescription" type="java.lang.String" value=""/>
+                                          </AccessibilityProperties>
                                         </Component>
                                       </SubComponents>
                                     </Container>

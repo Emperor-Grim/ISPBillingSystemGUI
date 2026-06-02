@@ -338,6 +338,7 @@ public class ISPBillingSystem extends javax.swing.JFrame {
         deleteBillBtn = new javax.swing.JButton();
         refreshBillBtn = new javax.swing.JButton();
         expBtn = new javax.swing.JButton();
+        generateReceiptBtn = new javax.swing.JButton();
         billTableHandler = new javax.swing.JPanel();
         billScrollPane = new javax.swing.JScrollPane();
         billTable = new javax.swing.JTable();
@@ -855,6 +856,15 @@ public class ISPBillingSystem extends javax.swing.JFrame {
         expBtn.addActionListener(this::expBtnActionPerformed);
         billToolBar.add(expBtn);
 
+        generateReceiptBtn.setBackground(new java.awt.Color(234, 243, 222));
+        generateReceiptBtn.setFont(new java.awt.Font("SansSerif", 0, 12)); // NOI18N
+        generateReceiptBtn.setForeground(new java.awt.Color(39, 80, 10));
+        generateReceiptBtn.setText("Generate Receipt");
+        generateReceiptBtn.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 8, 5, 8));
+        generateReceiptBtn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        generateReceiptBtn.addActionListener(this::generateReceiptBtnActionPerformed);
+        billToolBar.add(generateReceiptBtn);
+
         handlerBilling.add(billToolBar, java.awt.BorderLayout.NORTH);
 
         billTableHandler.setBackground(new java.awt.Color(255, 255, 255));
@@ -897,6 +907,7 @@ public class ISPBillingSystem extends javax.swing.JFrame {
         receiptArea.setColumns(20);
         receiptArea.setRows(5);
         jScrollPane1.setViewportView(receiptArea);
+        receiptArea.getAccessibleContext().setAccessibleDescription("");
 
         jPanel3.add(jScrollPane1, java.awt.BorderLayout.CENTER);
 
@@ -1169,6 +1180,54 @@ public class ISPBillingSystem extends javax.swing.JFrame {
         
     }//GEN-LAST:event_expBtnActionPerformed
 
+    private void generateReceiptBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_generateReceiptBtnActionPerformed
+        int row = billTable.getSelectedRow();
+
+        if(row == -1){
+            JOptionPane.showMessageDialog(
+                this,
+                "Select a bill first."
+            );
+            return;
+        }
+
+        String customer =
+                billTable.getValueAt(row,1).toString();
+
+        String period =
+                billTable.getValueAt(row,2).toString();
+
+        String amount =
+                billTable.getValueAt(row,3).toString();
+
+        Customer selectedCustomer = null;
+
+        for(Customer c : dao.getAllCustomers()){
+
+            if(c.getFullName().equals(customer)){
+                selectedCustomer = c;
+                break;
+            }
+        }
+
+        if(selectedCustomer != null){
+
+            updateReceiptPreview(
+                customer,
+                selectedCustomer.getAddress(),
+                selectedCustomer.getPlan(),
+                period,
+                amount,
+                selectedCustomer
+            );
+
+            CardLayout cl =
+                (CardLayout) contentPanel.getLayout();
+
+            cl.show(contentPanel, "receipts");
+        }
+    }//GEN-LAST:event_generateReceiptBtnActionPerformed
+
     
     
     public static void main(String args[]) {
@@ -1218,6 +1277,7 @@ public class ISPBillingSystem extends javax.swing.JFrame {
     private javax.swing.JButton editBtn;
     private javax.swing.JButton expBtn;
     private javax.swing.JButton generateBillBtn;
+    private javax.swing.JButton generateReceiptBtn;
     private javax.swing.JPanel handlerBilling;
     private javax.swing.JPanel handlerCustomer;
     private javax.swing.JPanel handlerTable;
