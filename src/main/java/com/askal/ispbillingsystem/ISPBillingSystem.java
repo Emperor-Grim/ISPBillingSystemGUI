@@ -1182,7 +1182,7 @@ public class ISPBillingSystem extends javax.swing.JFrame {
 
     private void generateReceiptBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_generateReceiptBtnActionPerformed
         int row = billTable.getSelectedRow();
-
+        java.awt.CardLayout cl = (java.awt.CardLayout) contentPanel.getLayout();
         if(row == -1){
             JOptionPane.showMessageDialog(
                 this,
@@ -1211,7 +1211,6 @@ public class ISPBillingSystem extends javax.swing.JFrame {
         }
 
         if(selectedCustomer != null){
-
             updateReceiptPreview(
                 customer,
                 selectedCustomer.getAddress(),
@@ -1220,12 +1219,10 @@ public class ISPBillingSystem extends javax.swing.JFrame {
                 amount,
                 selectedCustomer
             );
-
-            CardLayout cl =
-                (CardLayout) contentPanel.getLayout();
-
             cl.show(contentPanel, "receipts");
         }
+        
+
     }//GEN-LAST:event_generateReceiptBtnActionPerformed
 
     
