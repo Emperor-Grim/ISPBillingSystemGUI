@@ -67,7 +67,7 @@ public class BillDialog extends javax.swing.JDialog {
         jLabel1.setText("Customer:");
         formPanel.add(jLabel1);
 
-        customerCombo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        customerCombo.addActionListener(this::customerComboActionPerformed);
         formPanel.add(customerCombo);
 
         jLabel2.setBackground(new java.awt.Color(0, 0, 0));
@@ -132,6 +132,10 @@ public class BillDialog extends javax.swing.JDialog {
             JOptionPane.showMessageDialog(this, "Please check your inputs.\nDate format: YYYY-MM-DD");
         }
     }//GEN-LAST:event_saveBillBtnActionPerformed
+
+    private void customerComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_customerComboActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_customerComboActionPerformed
 
     /**
      * @param args the command line arguments

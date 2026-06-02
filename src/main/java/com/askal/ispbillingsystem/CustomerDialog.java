@@ -166,19 +166,15 @@ public class CustomerDialog extends javax.swing.JDialog {
         }
     } catch (NumberFormatException e) {
         JOptionPane.showMessageDialog(this, "Monthly due day must be a valid whole number.");
-        return; // Stop execution if parsing fails
+        return; 
     }
-
-    // 2. Validate and Parse Balance
     double balanceVal;
     try {
         balanceVal = Double.parseDouble(fBal.getText().trim());
     } catch (NumberFormatException e) {
         JOptionPane.showMessageDialog(this, "Balance must be a valid number.");
-        return; // Stop execution if parsing fails
+        return; 
     }
-    
-    // 3. If inputs are completely valid, commit updates safely to your customer model object
     customer.setFirstName(fFirst.getText().trim());
     customer.setLastName(fLast.getText().trim());
     customer.setAddress(fAddr.getText().trim());

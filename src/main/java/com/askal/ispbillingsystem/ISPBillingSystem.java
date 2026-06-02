@@ -10,8 +10,10 @@ import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
-/**
+/** database palagay
  CREATE TABLE bills (
     id          INT PRIMARY KEY AUTO_INCREMENT,
     customerId  INT,
@@ -46,6 +48,7 @@ public class ISPBillingSystem extends javax.swing.JFrame {
     //extra declaration needed
     private javax.swing.JPanel activeSideBtn = null;
     
+    
     //database
     CustomerDAO dao = new CustomerDAO();
     BillDAO billDao = new BillDAO();
@@ -59,7 +62,7 @@ public class ISPBillingSystem extends javax.swing.JFrame {
         
     //----------------------DASHBOARD MODIFICATION CUSTOM----------------------------------    
         //table Dashboard
-        String[] cols = {"ID","Full Name","Address","Plan","Balance","Status", "Due Month"};
+        String[] cols = {"ID","Full Name","Address","Plan","Balance","Status", "Due Month Day"};
         DefaultTableModel model = new DefaultTableModel(cols, 0) {
         public boolean isCellEditable(int r, int c) { return false; }
         };
@@ -69,9 +72,10 @@ public class ISPBillingSystem extends javax.swing.JFrame {
         styleStatusColumn(customerTable, 5);
         
         //table Customer Panel
-
-        
-        custTable = styledTable(model);
+        DefaultTableModel custmodel = new DefaultTableModel(cols, 0) {
+            public boolean isCellEditable(int r, int c) { return false; }
+        };
+        custTable = styledTable(custmodel);
         custScrollPane.setViewportView(custTable);
         styleStatusColumn(custTable, 5);
         
@@ -82,7 +86,7 @@ public class ISPBillingSystem extends javax.swing.JFrame {
             String.format("₱%.2f", c2.getBalance()), c2.getStatus()});
         });
         
-        String[] billCols = {"ID","Customer","Period","Amount","Due Date","Paid Date","Status"};
+        String[] billCols = {"ID","Customer","Period","Amount","Month Date","Paid Date","Status"};
         DefaultTableModel billModel = new DefaultTableModel(billCols, 0) {
         public boolean isCellEditable(int r, int c) { return false; }
         };
@@ -230,6 +234,39 @@ public class ISPBillingSystem extends javax.swing.JFrame {
         }
     
     
+      void updateReceiptPreview(String cust, String addr, String plan, String period, String amount, Customer c) {
+        String line = "================================";
+        String date = new SimpleDateFormat("MMMM d, yyyy").format(new Date());
+        String no   = "OR-" + new SimpleDateFormat("yyyyMMdd").format(new Date()) + "-" + (c != null ? c.getId() : "00");
+        
+        String text =
+                line + "\n" +
+                        "       ASKAL ISP SERVICES\n" +
+                        "      Official Receipt / OR\n" +
+                        "      Quezon City, NCR, PH\n" +
+                        line + "\n\n" +
+                        "Receipt No : " + no + "\n" +
+                        "Date       : " + date + "\n\n" +
+                        "BILLED TO:\n" +
+                        "  Name    : " + cust + "\n" +
+                        "  Address : " + (addr.isEmpty() ? "N/A" : addr) + "\n\n" +
+                        "SERVICE DETAILS:\n" +
+                        "  Plan    : " + plan + "\n" +
+                        "  Period  : " + period + "\n\n" +
+                        line + "\n" +
+                        "  Monthly Fee         : " + amount + "\n" +
+                        "  Discount            : ₱0.00\n" +
+                        "  ──────────────────────────\n" +
+                        "  TOTAL PAID          : " + amount + "\n" +
+                        line + "\n\n" +
+                        "  Thank you for paying on time!\n" +
+                        "  Support: 0917-000-0000\n" +
+                        line;
+        if (receiptArea != null) {
+            receiptArea.setText(text);
+        }
+    }
+    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -300,9 +337,15 @@ public class ISPBillingSystem extends javax.swing.JFrame {
         markBillPaidBtn = new javax.swing.JButton();
         deleteBillBtn = new javax.swing.JButton();
         refreshBillBtn = new javax.swing.JButton();
+        expBtn = new javax.swing.JButton();
         billTableHandler = new javax.swing.JPanel();
         billScrollPane = new javax.swing.JScrollPane();
         billTable = new javax.swing.JTable();
+        recieptHandler = new javax.swing.JPanel();
+        jPanel2 = new javax.swing.JPanel();
+        jPanel3 = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        receiptArea = new javax.swing.JTextArea();
         receiptsPanel = new javax.swing.JPanel();
         reportsPanel = new javax.swing.JPanel();
 
@@ -760,7 +803,7 @@ public class ISPBillingSystem extends javax.swing.JFrame {
 
         handlerBilling.setBackground(new java.awt.Color(255, 255, 255));
         handlerBilling.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(220, 225, 235), 1, true));
-        handlerBilling.setLayout(new java.awt.BorderLayout());
+        handlerBilling.setLayout(new java.awt.BorderLayout(10, 0));
 
         billToolBar.setBackground(new java.awt.Color(255, 255, 255));
         billToolBar.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 5, 10, 0));
@@ -808,11 +851,15 @@ public class ISPBillingSystem extends javax.swing.JFrame {
         refreshBillBtn.addActionListener(this::refreshBillBtnActionPerformed);
         billToolBar.add(refreshBillBtn);
 
+        expBtn.setText("Export");
+        expBtn.addActionListener(this::expBtnActionPerformed);
+        billToolBar.add(expBtn);
+
         handlerBilling.add(billToolBar, java.awt.BorderLayout.NORTH);
 
         billTableHandler.setBackground(new java.awt.Color(255, 255, 255));
         billTableHandler.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 12, 10, 12));
-        billTableHandler.setLayout(new java.awt.BorderLayout());
+        billTableHandler.setLayout(new java.awt.GridLayout(1, 2, 10, 10));
 
         billScrollPane.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
 
@@ -829,7 +876,35 @@ public class ISPBillingSystem extends javax.swing.JFrame {
         ));
         billScrollPane.setViewportView(billTable);
 
-        billTableHandler.add(billScrollPane, java.awt.BorderLayout.CENTER);
+        billTableHandler.add(billScrollPane);
+
+        recieptHandler.setBackground(new java.awt.Color(255, 255, 255));
+        recieptHandler.setBorder(javax.swing.BorderFactory.createTitledBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 1, true), "Official Receipt", javax.swing.border.TitledBorder.LEFT, javax.swing.border.TitledBorder.BELOW_TOP, new java.awt.Font("SansSerif", 1, 14), new java.awt.Color(0, 0, 0))); // NOI18N
+        recieptHandler.setLayout(new javax.swing.BoxLayout(recieptHandler, javax.swing.BoxLayout.LINE_AXIS));
+
+        jPanel2.setBackground(new java.awt.Color(245, 247, 250));
+        jPanel2.setBorder(javax.swing.BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        jPanel2.setForeground(new java.awt.Color(245, 247, 250));
+        jPanel2.setOpaque(false);
+        jPanel2.setLayout(new java.awt.BorderLayout());
+
+        jPanel3.setBackground(new java.awt.Color(245, 247, 250));
+        jPanel3.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 1, true));
+        jPanel3.setForeground(new java.awt.Color(245, 247, 250));
+        jPanel3.setLayout(new java.awt.BorderLayout());
+
+        receiptArea.setBackground(new java.awt.Color(248, 250, 253));
+        receiptArea.setColumns(20);
+        receiptArea.setRows(5);
+        jScrollPane1.setViewportView(receiptArea);
+
+        jPanel3.add(jScrollPane1, java.awt.BorderLayout.CENTER);
+
+        jPanel2.add(jPanel3, java.awt.BorderLayout.CENTER);
+
+        recieptHandler.add(jPanel2);
+
+        billTableHandler.add(recieptHandler);
 
         handlerBilling.add(billTableHandler, java.awt.BorderLayout.CENTER);
 
@@ -838,7 +913,8 @@ public class ISPBillingSystem extends javax.swing.JFrame {
         contentPanel.add(billingPanel, "billing");
 
         receiptsPanel.setBackground(new java.awt.Color(245, 247, 250));
-        receiptsPanel.setLayout(new java.awt.GridBagLayout());
+        receiptsPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(14, 14, 14, 14));
+        receiptsPanel.setLayout(new java.awt.BorderLayout());
         contentPanel.add(receiptsPanel, "receipts");
 
         reportsPanel.setBackground(new java.awt.Color(245, 247, 250));
@@ -1062,6 +1138,37 @@ public class ISPBillingSystem extends javax.swing.JFrame {
         refreshBillTable();
     }//GEN-LAST:event_refreshBillBtnActionPerformed
 
+    private void expBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_expBtnActionPerformed
+        String text = receiptArea.getText();
+        if (text == null || text.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "There is no receipt previewed to export!", "Warning", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        String extractedNo = "UNKNOWN";
+        if (text.contains("Receipt No : ")) {
+            int start = text.indexOf("Receipt No : ") + "Receipt No : ".length();
+            int end = text.indexOf("\n", start);
+            if (end != -1) {
+                extractedNo = text.substring(start, end).trim();
+            }
+        }
+        
+        JFileChooser fc = new JFileChooser();
+        fc.setSelectedFile(new java.io.File("receipt_" + extractedNo + ".txt"));
+        
+        if (fc.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+            try (java.io.FileWriter fw = new java.io.FileWriter(fc.getSelectedFile())) {
+                fw.write(text);
+                JOptionPane.showMessageDialog(this, "Receipt text document exported successfully!", "Done", JOptionPane.INFORMATION_MESSAGE);
+            } catch (Exception ex) { 
+                ex.printStackTrace(); 
+                JOptionPane.showMessageDialog(this, "Failed to save file. Check system folder permissions.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        
+    }//GEN-LAST:event_expBtnActionPerformed
+
     
     
     public static void main(String args[]) {
@@ -1109,6 +1216,7 @@ public class ISPBillingSystem extends javax.swing.JFrame {
     private javax.swing.JButton deleteBillBtn;
     private javax.swing.JLabel dl;
     private javax.swing.JButton editBtn;
+    private javax.swing.JButton expBtn;
     private javax.swing.JButton generateBillBtn;
     private javax.swing.JPanel handlerBilling;
     private javax.swing.JPanel handlerCustomer;
@@ -1116,6 +1224,9 @@ public class ISPBillingSystem extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblBalance;
     private javax.swing.JLabel lblBillingHeader;
     private javax.swing.JLabel lblCustomerHeader;
@@ -1127,7 +1238,9 @@ public class ISPBillingSystem extends javax.swing.JFrame {
     private javax.swing.JButton markBillPaidBtn;
     private javax.swing.JLabel n;
     private javax.swing.JButton payBtn;
+    private javax.swing.JTextArea receiptArea;
     private javax.swing.JPanel receiptsPanel;
+    private javax.swing.JPanel recieptHandler;
     private javax.swing.JButton refBtn;
     private javax.swing.JButton refBtn1;
     private javax.swing.JButton refreshBillBtn;
